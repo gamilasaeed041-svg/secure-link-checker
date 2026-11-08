@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>فاحص الروابط الآمن</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; color: #fff;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%; max-width: 520px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+        .icon { margin-bottom: 10px; }
+        h1 { font-size: 26px; margin-bottom: 8px; }
+        p.sub { color: #cbd5e1; font-size: 14px; margin-bottom: 25px; }
+        .box { display: flex; gap: 10px; }
+        input {
+            flex: 1; padding: 14px; border-radius: 12px;
+            border: 2px solid transparent; background: #fff;
+            font-size: 15px; outline: none; direction: ltr; text-align: left;
+        }
+        input:focus { border-color: #38bdf8; }
+        button {
+            padding: 14px 22px; border: none; border-radius: 12px;
+            background: #38bdf8; color: #0f172a; font-weight: bold; font-size: 15px;
+            cursor: pointer; transition: transform 0.15s, background 0.15s;
+        }
+        button:hover { background: #7dd3fc; transform: translateY(-2px); }
+        button:disabled { opacity: 0.6; cursor: wait; }
+        #result {
+            margin-top: 25px; padding: 18px; border-radius: 14px;
+            display: none; font-size: 16px; line-height: 1.8;
+            animation: fade 0.4s ease;
+        }
+        #result.safe { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; }
+        #result.warn { background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; }
+        #result.bad  { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; }
+        .score { font-size: 44px; font-weight: bold; line-height: 1.1; }
+        .score span { font-size: 18px; color: #cbd5e1; }
+        .bar { height: 10px; background: rgba(255,255,255,0.15); border-radius: 10px; margin: 10px 0 14px; overflow: hidden; }
+        .fill { height: 100%; background: #38bdf8; border-radius: 10px; transition: width 0.6s; }
+        #result.safe .fill { background: #22c55e; }
+        #result.warn .fill { background: #eab308; }
+        #result.bad .fill { background: #ef4444; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        .note { margin-top: 20px; font-size: 12px; color: #94a3b8; }
+        .links { margin-top: 14px; font-size: 13px; }
+        .links a { color: #38bdf8; text-decoration: none; }
+        .credit {
+            margin-top: 22px; padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 13px; color: #cbd5e1; direction: ltr; letter-spacing: 0.5px;
+        }
+        .credit span { color: #38bdf8; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l8 3v6c0 4.5-3.2 8.2-8 9-4.8-.8-8-4.5-8-9V6l8-3z"/>
+                <path d="M9 12l2 2 4-4"/>
+            </svg>
+        </div>
+        <h1>فاحص الروابط الآمن</h1>
+        <p class="sub">الصقي أي رابط وشوفي لو فيه أي علامات خطر</p>
+
+        <div class="box">
+            <input type="text" id="url" placeholder="https://example.com">
+            <button id="btn" onclick="checkLink()">افحص</button>
+        </div>
+
+        <div id="result"></div>
+
+        <p class="links"><a href="/stats">📊 شوفي الإحصائيات</a></p>
+        <p class="note">مفيش أداة بتضمن الأمان 100%، النتيجة مبنية على الفحص المتاح.</p>
+        <p class="credit">Programmed by <span>Gamila Saeed</span></p>
+    </div>
+
+    <script>
+        const input = document.getElementById("url");
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") checkLink();
+        });
+
+        async function checkLink() {
+            const url = input.value.trim();
+            const box = document.getElementById("result");
+            const btn = document.getElementById("btn");
+
+            if (!url) return;
+
+            btn.disabled = true;
+            btn.textContent = "بيفحص...";
+            box.style.display = "none";
+
+            try {
+                const res = await fetch("/check", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json();
+                box.className = data.level;
+                box.innerHTML = data.message;
+            } catch (err) {
+                box.className = "bad";
+                box.innerHTML = "حصل خطأ في الاتصال بالسيرفر";
+            }
+
+            box.style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "افحص";
+        }
+    </script>
+</body>
+</html>

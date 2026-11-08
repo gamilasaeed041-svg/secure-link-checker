@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>إحصائيات الفحص</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            min-height: 100vh; padding: 20px; color: #fff;
+        }
+        .wrap { max-width: 760px; margin: 0 auto; }
+        h1 { margin: 20px 0; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+               border-radius: 14px; padding: 18px; text-align: center; }
+        .box b { display: block; font-size: 30px; margin-bottom: 4px; }
+        .safe b { color: #4ade80; } .warn b { color: #facc15; } .bad b { color: #f87171; }
+        table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.06);
+                border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+        th, td { padding: 10px 12px; text-align: right; font-size: 14px; }
+        th { background: rgba(255,255,255,0.12); }
+        td.host { direction: ltr; text-align: left; }
+        a { color: #38bdf8; display: block; text-align: center; margin-top: 10px; }
+        h2 { margin: 18px 0 10px; font-size: 18px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>📊 إحصائيات الفحوصات</h1>
+
+    <div class="grid">
+        <div class="box"><b>{{ s.total }}</b>إجمالي الفحوصات</div>
+        <div class="box safe"><b>{{ s.safe }}</b>آمن</div>
+        <div class="box warn"><b>{{ s.warn }}</b>مشبوه</div>
+        <div class="box bad"><b>{{ s.bad }}</b>خطير</div>
+        <div class="box"><b>{{ s.avg }}</b>متوسط الدرجة</div>
+    </div>
+
+    <h2>آخر 10 فحوصات</h2>
+    <table>
+        <tr><th>الموقع</th><th>النتيجة</th><th>الدرجة</th><th>الوقت</th></tr>
+        {% for host, level, score, t in s.recent %}
+        <tr>
+            <td class="host">{{ host }}</td>
+            <td>{{ {"safe": "آمن", "warn": "مشبوه", "bad": "خطير"}[level] }}</td>
+            <td>{{ score }}</td>
+            <td>{{ t }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>أكتر المواقع فحصاً</h2>
+    <table>
+        <tr><th>الموقع</th><th>عدد المرات</th></tr>
+        {% for host, c in s.top %}
+        <tr><td class="host">{{ host }}</td><td>{{ c }}</td></tr>
+        {% endfor %}
+    </table>
+
+    <a href="/">← رجوع للفاحص</a>
+</div>
+</body>
+</html>
