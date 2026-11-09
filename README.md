@@ -1,3 +1,6 @@
+## 🔗 Live Demo
+[https://gamilasaid.pythonanywhere.com](https://gamilasaid.pythonanywhere.com)
+
 # 🛡️ Secure Link Checker
 
 A Flask web application that analyzes URLs and gives each one a **0–100 safety score** based on multiple security checks. Built with security-by-design principles, with an Arabic interface.
@@ -23,7 +26,8 @@ Python · Flask · SQLite · Requests · python-whois · HTML/CSS/JavaScript
 ## Installation
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/gamilasaeed041-svg/link-checker.git
+
 cd link-checker
 python -m venv venv
 venv\Scripts\activate        # Linux/Mac: source venv/bin/activate
